@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Админка турнира Standoff 2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    textarea, input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: none;
+      background: #222;
+      color: white;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      background: #facc15;
+      border: none;
+      border-radius: 8px;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background: #eab308;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #facc15;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Админка турнира Standoff 2</h1>
+
+  <label>Список команд (каждая команда с новой строки в формате: Название команды,Капитан ID,Игрок1 ID,Игрок2 ID,...)</label>
+  <textarea id="teamsInput" rows="8" placeholder="Пример: TeamA,12345,111,222,333,444"></textarea>
+
+  <label>Список матчей (каждый матч с новой строки, формат: Команда1,Счет1,Команда2,Счет2)</label>
+  <textarea id="matchesInput" rows="8" placeholder="Пример: TeamA,2,TeamB,1"></textarea>
+
+  <button onclick="saveData()">Сохранить данные</button>
+
+  <script>
+    // Загружаем данные при открытии
+    window.onload = function() {
+      const teamsData = JSON.parse(localStorage.getItem("teamsData") || "[]");
+      const matchesData = JSON.parse(localStorage.getItem("matchesData") || "[]");
+
+      // Формируем текст для команд
+      const teamsText = teamsData.map(t => [t.name, t.captainId, ...t.players].join(",")).join("\n");
+      document.getElementById("teamsInput").value = teamsText;
+
+      // Формируем текст для матчей
+      const matchesText = matchesData.map(m => [m.team1, m.score1, m.team2, m.score2].join(",")).join("\n");
+      document.getElementById("matchesInput").value = matchesText;
+    }
+
+    function saveData() {
+      // Читаем команды из textarea
+      const teamsRaw = document.getElementById("teamsInput").value.trim();
+      const teamsLines = teamsRaw.split("\n").filter(l => l.trim() !== "");
+      const teamsData = teamsLines.map(line => {
+        const parts = line.split(",").map(s => s.trim());
+        return {
+          name: parts[0] || "Без имени",
+          captainId: parts[1] || "",
+          players: parts.slice(2)
+        };
+      });
+
+      // Читаем матчи
+      const matchesRaw = document.getElementById("matchesInput").value.trim();
+      const matchesLines = matchesRaw.split("\n").filter(l => l.trim() !== "");
+      const matchesData = matchesLines.map(line => {
+        const parts = line.split(",").map(s => s.trim());
+        return {
+          team1: parts[0] || "",
+          score1: parts[1] !== undefined ? parseInt(parts[1]) : null,
+          team2: parts[2] || "",
+          score2: parts[3] !== undefined ? parseInt(parts[3]) : null,
+        };
+      });
+
+      // Сохраняем в localStorage
+      localStorage.setItem("teamsData", JSON.stringify(teamsData));
+      localStorage.setItem("matchesData", JSON.stringify(matchesData));
+
+      alert("Данные сохранены!");
+    }
+  </script>
+
+</body>
+</html>
