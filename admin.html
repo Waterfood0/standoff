@@ -1,283 +1,459 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>Админка турнира Standoff 2</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    textarea, input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border-radius: 8px;
-      border: none;
-      background: #222;
-      color: white;
-      font-size: 16px;
-      box-sizing: border-box;
-      resize: vertical;
-    }
-    button {
-      margin-top: 20px;
-      padding: 12px 20px;
-      background: #facc15;
-      border: none;
-      border-radius: 8px;
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      font-size: 18px;
-    }
-    button:hover {
-      background: #eab308;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #facc15;
-    }
-    .match {
-      border: 1px solid #facc15;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      background: #222;
-    }
-    .match label {
-      display: inline-block;
-      margin-right: 20px;
-      cursor: pointer;
-    }
-    .score-input {
-      width: 60px;
-      padding: 5px;
-      margin-left: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #333;
-      color: white;
-      font-size: 16px;
-      text-align: center;
-    }
-    .info {
-      font-size: 14px;
-      color: #bbb;
-      margin-top: 10px;
-      text-align: center;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>Админка турнира Standoff 2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="number"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: none;
+      background: #222;
+      color: white;
+      font-size: 16px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      background: #facc15;
+      border: none;
+      border-radius: 8px;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    button:hover {
+      background: #eab308;
+    }
+    h1, h2, h3 {
+      color: #facc15;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+    .match {
+      border: 1px solid #facc15;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      background: #222;
+    }
+    .match label {
+      display: inline-block;
+      margin-right: 20px;
+      cursor: pointer;
+    }
+    .score-input {
+      width: 60px;
+      padding: 5px;
+      margin-left: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #333;
+      color: white;
+      font-size: 16px;
+      text-align: center;
+    }
+    .info {
+      font-size: 14px;
+      color: #bbb;
+      margin-top: 10px;
+      text-align: center;
+    }
+    .team-list {
+      margin-top: 10px;
+    }
+    .team-item {
+      background: #222;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .team-name {
+      font-weight: bold;
+    }
+    .team-buttons button {
+      margin-left: 5px;
+      padding: 5px 10px;
+      font-size: 14px;
+      background: #444;
+      color: white;
+      border-radius: 6px;
+    }
+    .team-buttons button:hover {
+      background: #666;
+    }
+    .add-team-form {
+      background: #222;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .add-team-form input {
+      margin-top: 6px;
+    }
+    .small-input {
+      width: 120px;
+      display: inline-block;
+      margin-right: 10px;
+    }
+  </style>
 </head>
 <body>
 
-  <h1>Админка турнира Standoff 2</h1>
+  <h1>Админка турнира Standoff 2</h1>
 
-  <label for="teamsInput">Список команд (каждая команда с новой строки в формате:<br>Название команды,Капитан ID,Игрок1 ID,Игрок2 ID,...)</label>
-  <textarea id="teamsInput" rows="8" placeholder="Пример: TeamA,12345,111,222,333,444"></textarea>
+  <h2>Информация о турнире</h2>
+  <label for="tournamentName">Название турнира</label>
+  <input type="text" id="tournamentName" placeholder="Название турнира" />
 
-  <button onclick="saveTeams()">Сохранить команды</button>
+  <label for="tournamentDescription">Описание турнира</label>
+  <textarea id="tournamentDescription" rows="3" placeholder="Описание"></textarea>
 
-  <hr style="margin: 30px 0; border-color: #333;" />
+  <label for="tournamentBudget">Бюджет турнира (в рублях)</label>
+  <input type="number" id="tournamentBudget" min="0" placeholder="Бюджет" />
 
-  <h2>Пары текущего раунда</h2>
-  <div id="matchesContainer">
-    <p class="info">Пары ещё не сформированы. Сформируйте новый раунд.</p>
-  </div>
+  <label for="teamEntryFee">Взнос с команды (в рублях)</label>
+  <input type="number" id="teamEntryFee" min="0" placeholder="Взнос с команды" />
 
-  <button onclick="startNewRound()">Сформировать новый раунд (рандом)</button>
-  <button onclick="saveMatchResults()">Сохранить результаты матчей</button>
+  <label for="paymentLink">Ссылка на оплату</label>
+  <input type="text" id="paymentLink" placeholder="https://example.com/pay" />
 
-  <script>
-    // Загрузка и сохранение команд
-    function loadTeams() {
-      return JSON.parse(localStorage.getItem("teamsData") || "[]");
-    }
+  <button onclick="saveTournamentInfo()">Сохранить информацию о турнире</button>
 
-    function saveTeams() {
-      const teamsRaw = document.getElementById("teamsInput").value.trim();
-      const lines = teamsRaw.split("\n").filter(line => line.trim() !== "");
-      const teams = lines.map(line => {
-        const parts = line.split(",").map(s => s.trim());
-        return {
-          name: parts[0] || "Без имени",
-          captainId: parts[1] || "",
-          players: parts.slice(2)
-        };
-      });
-      localStorage.setItem("teamsData", JSON.stringify(teams));
-      alert("Команды сохранены!");
-      renderMatches(); // Обновим пары на случай, если команды поменялись
-    }
+  <hr style="margin: 30px 0; border-color: #333;" />
 
-    // Загрузка и сохранение пар для текущего раунда
-    function loadRoundPairs() {
-      return JSON.parse(localStorage.getItem("roundPairs") || "[]");
-    }
+  <h2>Команды</h2>
+  <div id="teamsContainer" class="team-list"></div>
 
-    function saveRoundPairs(pairs) {
-      localStorage.setItem("roundPairs", JSON.stringify(pairs));
-    }
+  <div class="add-team-form">
+    <h3>Добавить / Редактировать команду</h3>
+    <label>Название команды</label>
+    <input type="text" id="teamNameInput" placeholder="Название команды" />
 
-    // Загрузка и сохранение результатов матчей
-    function loadMatchResults() {
-      return JSON.parse(localStorage.getItem("matchesData") || "[]");
-    }
+    <label>Капитан ID</label>
+    <input type="text" id="captainIdInput" placeholder="ID капитана" />
 
-    function saveMatchResultsToStorage(results) {
-      localStorage.setItem("matchesData", JSON.stringify(results));
-    }
+    <label>Игроки (через запятую)</label>
+    <input type="text" id="playersInput" placeholder="ID игроков через запятую" />
 
-    // Рендеринг формы для ввода результатов матчей
-    function renderMatches() {
-      const container = document.getElementById("matchesContainer");
-      const pairs = loadRoundPairs();
+    <button onclick="addOrUpdateTeam()">Добавить / Обновить команду</button>
+    <button onclick="clearTeamForm()" style="background:#555; margin-left:10px;">Очистить форму</button>
+  </div>
 
-      if (pairs.length === 0) {
-        container.innerHTML = '<p class="info">Пары ещё не сформированы. Сформируйте новый раунд.</p>';
-        return;
-      }
+  <hr style="margin: 30px 0; border-color: #333;" />
 
-      const results = loadMatchResults();
+  <h2>Пары текущего раунда</h2>
+  <div id="matchesContainer">
+    <p class="info">Пары ещё не сформированы. Сформируйте новый раунд.</p>
+  </div>
 
-      container.innerHTML = "";
-      pairs.forEach((pair, idx) => {
-        // Находим уже сохранённый результат, если есть
-        const savedResult = results.find(r =>
-          (r.team1 === pair.team1 && r.team2 === pair.team2) ||
-          (r.team1 === pair.team2 && r.team2 === pair.team1)
-        );
+  <button onclick="startNewRound()">Сформировать новый раунд (рандом)</button>
+  <button onclick="saveMatchResults()">Сохранить результаты матчей</button>
 
-        container.insertAdjacentHTML("beforeend", `
-          <div class="match">
-            <div>
-              <label>
-                <input type="radio" name="winner${idx}" value="team1" ${savedResult && savedResult.winner === pair.team1 ? "checked" : ""} />
-                <strong>${pair.team1}</strong>
-              </label>
-              <input type="number" min="0" id="score1_${idx}" class="score-input" placeholder="Счет" value="${savedResult && savedResult.team1 === pair.team1 ? savedResult.score1 : ""}" />
-            </div>
-            <div style="margin-top: 10px;">
-              <label>
-                <input type="radio" name="winner${idx}" value="team2" ${savedResult && savedResult.winner === pair.team2 ? "checked" : ""} />
-                <strong>${pair.team2}</strong>
-              </label>
-              <input type="number" min="0" id="score2_${idx}" class="score-input" placeholder="Счет" value="${savedResult && savedResult.team2 === pair.team2 ? savedResult.score2 : ""}" />
-            </div>
-          </div>
-        `);
-      });
-    }
+  <script>
+    // --- Данные турнира ---
+    function loadTournamentInfo() {
+      const info = JSON.parse(localStorage.getItem("tournamentInfo") || "{}");
+      return {
+        name: info.name || "",
+        description: info.description || "",
+        budget: info.budget || "",
+        entryFee: info.entryFee || "",
+        paymentLink: info.paymentLink || ""
+      };
+    }
 
-    // Сохраняем результаты и обновляем команды (удаляем проигравших)
-    function saveMatchResults() {
-      const pairs = loadRoundPairs();
-      const results = [];
+    function saveTournamentInfo() {
+      const info = {
+        name: document.getElementById("tournamentName").value.trim(),
+        description: document.getElementById("tournamentDescription").value.trim(),
+        budget: document.getElementById("tournamentBudget").value.trim(),
+        entryFee: document.getElementById("teamEntryFee").value.trim(),
+        paymentLink: document.getElementById("paymentLink").value.trim(),
+      };
+      localStorage.setItem("tournamentInfo", JSON.stringify(info));
+      alert("Информация о турнире сохранена!");
+    }
 
-      for (let i = 0; i < pairs.length; i++) {
-        const score1Input = document.getElementById(`score1_${i}`);
-        const score2Input = document.getElementById(`score2_${i}`);
-        const winnerRadio = document.querySelector(`input[name="winner${i}"]:checked`);
+    function renderTournamentInfo() {
+      const info = loadTournamentInfo();
+      document.getElementById("tournamentName").value = info.name;
+      document.getElementById("tournamentDescription").value = info.description;
+      document.getElementById("tournamentBudget").value = info.budget;
+      document.getElementById("teamEntryFee").value = info.entryFee;
+      document.getElementById("paymentLink").value = info.paymentLink;
+    }
 
-        if (!score1Input.value || !score2Input.value || !winnerRadio) {
-          alert(`Пожалуйста, заполните все поля для матча №${i + 1}`);
-          return;
-        }
+    // --- Работа с командами ---
+    function loadTeams() {
+      return JSON.parse(localStorage.getItem("teamsData") || "[]");
+    }
 
-        const score1 = parseInt(score1Input.value);
-        const score2 = parseInt(score2Input.value);
-        if (isNaN(score1) || isNaN(score2)) {
-          alert(`Введите корректные числа в счетах для матча №${i + 1}`);
-          return;
-        }
+    function saveTeams(teams) {
+      localStorage.setItem("teamsData", JSON.stringify(teams));
+    }
 
-        const winner = winnerRadio.value === "team1" ? pairs[i].team1 : pairs[i].team2;
-        const loser = winnerRadio.value === "team1" ? pairs[i].team2 : pairs[i].team1;
+    function renderTeams() {
+      const container = document.getElementById("teamsContainer");
+      const teams = loadTeams();
 
-        results.push({
-          team1: pairs[i].team1,
-          score1,
-          team2: pairs[i].team2,
-          score2,
-          winner,
-          loser,
-        });
-      }
+      if (teams.length === 0) {
+        container.innerHTML = '<p class="info">Команды не добавлены.</p>';
+        return;
+      }
 
-      // Сохраняем результаты
-      saveMatchResultsToStorage(results);
+      container.innerHTML = "";
+      teams.forEach((team, idx) => {
+        const teamEl = document.createElement("div");
+        teamEl.className = "team-item";
+        teamEl.innerHTML = `
+          <div>
+            <div class="team-name">${team.name}</div>
+            <div>Капитан: ${team.captainId || "-"}</div>
+            <div>Игроки: ${team.players.length > 0 ? team.players.join(", ") : "-"}</div>
+          </div>
+          <div class="team-buttons">
+            <button onclick="editTeam(${idx})">Редактировать</button>
+            <button onclick="deleteTeam(${idx})">Удалить</button>
+          </div>
+        `;
+        container.appendChild(teamEl);
+      });
+    }
 
-      // Обновляем список команд: удаляем проигравших
-      let teams = loadTeams();
-      results.forEach(match => {
-        teams = teams.filter(t => t.name !== match.loser);
-      });
-      localStorage.setItem("teamsData", JSON.stringify(teams));
+    function addOrUpdateTeam() {
+      const name = document.getElementById("teamNameInput").value.trim();
+      const captainId = document.getElementById("captainIdInput").value.trim();
+      const playersRaw = document.getElementById("playersInput").value.trim();
 
-      // Очищаем пары и результаты — следующий раунд будет свежим
-      localStorage.removeItem("roundPairs");
-      localStorage.removeItem("matchesData");
+      if (!name) {
+        alert("Введите название команды.");
+        return;
+      }
 
-      alert("Результаты сохранены! Проигравшие удалены из списка команд.");
-      renderTeamsInput();
-      renderMatches();
-    }
+      const players = playersRaw ? playersRaw.split(",").map(p => p.trim()).filter(p => p) : [];
 
-    // Формируем пары на новый раунд рандомно
-    function startNewRound() {
-      let teams = loadTeams();
+      let teams = loadTeams();
 
-      if (teams.length < 2) {
-        alert("Недостаточно команд для нового раунда.");
-        return;
-      }
+      if (window.editingTeamIndex != null) {
+        // Обновляем существующую команду
+        teams[window.editingTeamIndex] = { name, captainId, players };
+        window.editingTeamIndex = null;
+      } else {
+        // Добавляем новую
+        if (teams.find(t => t.name.toLowerCase() === name.toLowerCase())) {
+          alert("Команда с таким названием уже существует.");
+          return;
+        }
+        teams.push({ name, captainId, players });
+      }
 
-      // Перемешиваем
-      teams = teams.sort(() => Math.random() - 0.5);
+      saveTeams(teams);
+      renderTeams();
+      clearTeamForm();
+    }
 
-      const pairs = [];
-      while (teams.length > 1) {
-        const team1 = teams.shift().name;
-        const team2 = teams.shift().name;
-        pairs.push({ team1, team2 });
-      }
+    function editTeam(idx) {
+      const teams = loadTeams();
+      const team = teams[idx];
+      document.getElementById("teamNameInput").value = team.name;
+      document.getElementById("captainIdInput").value = team.captainId;
+      document.getElementById("playersInput").value = team.players.join(", ");
+      window.editingTeamIndex = idx;
+    }
 
-      // Если нечетное число — последняя команда получает "бай"
-      if (teams.length === 1) {
-        pairs.push({ team1: teams[0].name, team2: "бай" });
-        teams.shift();
-      }
+    function deleteTeam(idx) {
+      if (!confirm("Удалить эту команду?")) return;
+      let teams = loadTeams();
+      teams.splice(idx, 1);
+      saveTeams(teams);
+      renderTeams();
+    }
 
-      saveRoundPairs(pairs);
-      renderMatches();
-      alert("Новый раунд сформирован!");
-    }
+    function clearTeamForm() {
+      document.getElementById("teamNameInput").value = "";
+      document.getElementById("captainIdInput").value = "";
+      document.getElementById("playersInput").value = "";
+      window.editingTeamIndex = null;
+    }
 
-    // Обновляем textarea с командами при изменениях
-    function renderTeamsInput() {
-      const teams = loadTeams();
-      const teamsText = teams.map(t => [t.name, t.captainId, ...t.players].join(",")).join("\n");
-      document.getElementById("teamsInput").value = teamsText;
-    }
+    // --- Раунды и матчи ---
 
-    // При загрузке страницы
-    window.onload = function() {
-      renderTeamsInput();
-      renderMatches();
-    };
-  </script>
+    function loadRoundPairs() {
+      return JSON.parse(localStorage.getItem("roundPairs") || "[]");
+    }
+
+    function saveRoundPairs(pairs) {
+      localStorage.setItem("roundPairs", JSON.stringify(pairs));
+    }
+
+    function loadMatchResults() {
+      return JSON.parse(localStorage.getItem("matchesData") || "[]");
+    }
+
+    function saveMatchResultsToStorage(results) {
+      localStorage.setItem("matchesData", JSON.stringify(results));
+    }
+
+    function renderMatches() {
+      const container = document.getElementById("matchesContainer");
+      const pairs = loadRoundPairs();
+
+      if (pairs.length === 0) {
+        container.innerHTML = '<p class="info">Пары ещё не сформированы. Сформируйте новый раунд.</p>';
+        return;
+      }
+
+      const results = loadMatchResults();
+
+      container.innerHTML = "";
+      pairs.forEach((pair, idx) => {
+        if(pair.team2 === "бай") {
+          container.insertAdjacentHTML("beforeend", `
+            <div class="match">
+              <strong>${pair.team1}</strong> получает "бай" и автоматически проходит дальше.
+            </div>
+          `);
+          return;
+        }
+        const savedResult = results.find(r =>
+          (r.team1 === pair.team1 && r.team2 === pair.team2) ||
+          (r.team1 === pair.team2 && r.team2 === pair.team1)
+        );
+
+        container.insertAdjacentHTML("beforeend", `
+          <div class="match">
+            <div>
+              <label>
+                <input type="radio" name="winner${idx}" value="team1" ${savedResult && savedResult.winner === pair.team1 ? "checked" : ""} />
+                <strong>${pair.team1}</strong>
+              </label>
+              <input type="number" min="0" id="score1_${idx}" class="score-input" placeholder="Счет" value="${savedResult && savedResult.team1 === pair.team1 ? savedResult.score1 : ""}" />
+            </div>
+            <div style="margin-top: 10px;">
+              <label>
+                <input type="radio" name="winner${idx}" value="team2" ${savedResult && savedResult.winner === pair.team2 ? "checked" : ""} />
+                <strong>${pair.team2}</strong>
+              </label>
+              <input type="number" min="0" id="score2_${idx}" class="score-input" placeholder="Счет" value="${savedResult && savedResult.team2 === pair.team2 ? savedResult.score2 : ""}" />
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    function startNewRound() {
+      let teams = loadTeams();
+
+      if (teams.length < 2) {
+        alert("Недостаточно команд для нового раунда.");
+        return;
+      }
+
+      // Перемешиваем
+      teams = teams.sort(() => Math.random() - 0.5);
+
+      const pairs = [];
+      while (teams.length > 1) {
+        const team1 = teams.shift().name;
+        const team2 = teams.shift().name;
+        pairs.push({ team1, team2 });
+      }
+
+      if (teams.length === 1) {
+        pairs.push({ team1: teams[0].name, team2: "бай" });
+        teams.shift();
+      }
+
+      saveRoundPairs(pairs);
+      renderMatches();
+      alert("Новый раунд сформирован!");
+    }
+
+    function saveMatchResults() {
+      const pairs = loadRoundPairs();
+      const results = [];
+
+      for (let i = 0; i < pairs.length; i++) {
+        if(pairs[i].team2 === "бай") continue;
+
+        const score1Input = document.getElementById(`score1_${i}`);
+        const score2Input = document.getElementById(`score2_${i}`);
+        const winnerRadio = document.querySelector(`input[name="winner${i}"]:checked`);
+
+        if (!score1Input.value || !score2Input.value || !winnerRadio) {
+          alert(`Пожалуйста, заполните все поля для матча №${i + 1}`);
+          return;
+        }
+
+        const score1 = parseInt(score1Input.value);
+        const score2 = parseInt(score2Input.value);
+        if (isNaN(score1) || isNaN(score2)) {
+          alert(`Введите корректные числа в счетах для матча №${i + 1}`);
+          return;
+        }
+
+        const winner = winnerRadio.value === "team1" ? pairs[i].team1 : pairs[i].team2;
+        const loser = winnerRadio.value === "team1" ? pairs[i].team2 : pairs[i].team1;
+
+        results.push({
+          team1: pairs[i].team1,
+          score1,
+          team2: pairs[i].team2,
+          score2,
+          winner,
+          loser,
+        });
+      }
+
+      // Сохраняем результаты
+      saveMatchResultsToStorage(results);
+
+      // Обновляем список команд: удаляем проигравших
+      let teams = loadTeams();
+      results.forEach(match => {
+        teams = teams.filter(t => t.name !== match.loser);
+      });
+      saveTeams(teams);
+
+      // Очищаем пары и результаты — следующий раунд будет свежим
+      localStorage.removeItem("roundPairs");
+      localStorage.removeItem("matchesData");
+
+      alert("Результаты сохранены! Проигравшие удалены из списка команд.");
+      renderTeams();
+      renderMatches();
+    }
+
+    // --- При загрузке страницы ---
+    window.onload = function() {
+      renderTournamentInfo();
+      renderTeams();
+      renderMatches();
+    };
+  </script>
 
 </body>
 </html>
