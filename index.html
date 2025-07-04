@@ -1,346 +1,37 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<title>Турниры Standoff 2 — Регистрация</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(to bottom, #111, #000);
-    color: white;
-  }
-  header {
-    text-align: center;
-    padding: 40px 20px;
-  }
-  h1 {
-    color: #facc15;
-    font-size: 40px;
-    margin-bottom: 10px;
-  }
-  .container {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-  }
-  .card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #facc15;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 30px;
-    overflow: hidden;
-  }
-  .btn {
-    background: #facc15;
-    color: black;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    width: 100%;
-  }
-  .btn:hover {
-    background: #eab308;
-  }
-  .hidden {
-    display: none;
-  }
-  input[type="text"], input[type="tel"] {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0 16px;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
-  }
-  label {
-    font-size: 14px;
-  }
-  ul {
-    padding-left: 20px;
-  }
-  li {
-    margin-bottom: 6px;
-    color: #facc15;
-  }
-  li.eliminated {
-    text-decoration: line-through;
-    opacity: 0.5;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-  }
-  th, td {
-    padding: 8px;
-    border-bottom: 1px solid #facc15;
-    text-align: center;
-  }
-  th {
-    text-align: left;
-  }
-  .winner-btn {
-    background: #28a745;
-    color: white;
-    border-radius: 6px;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-weight: bold;
-    margin: 0 2px;
-  }
-  .winner-btn:hover {
-    background: #218838;
-  }
-  @media (max-width: 500px) {
-    h1 { font-size: 28px; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Регистрация на турнир</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: white; text-align: center; padding: 50px; }
+    input { padding: 10px; font-size: 16px; width: 250px; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; cursor: pointer; }
+  </style>
 </head>
 <body>
-<header>
-  <h1>🔥 Турниры Standoff 2</h1>
-</header>
-<div class="container">
-  <div class="card">
-    <h2>Турнир #3</h2>
-    <p>Описание: Турнир 5x5, приз — 5000₽, взнос — 100₽/игрок</p>
-    <p>Дата: 10 июля 2025, 18:00</p>
-    <button class="btn" onclick="showRegistration()">Участвовать</button>
-  </div>
+  <h1>Регистрация на турнир</h1>
+  <input type="tel" id="phone" placeholder="Введите номер телефона"><br>
+  <button onclick="register()">Зарегистрироваться</button>
+  <p id="status"></p>
 
-  <div id="registration" class="card hidden">
-    <h3>Регистрация</h3>
-    <input type="tel" placeholder="Номер телефона (капитана)" id="phone" />
-    <input type="text" placeholder="ID капитана в Standoff 2" id="captainId" />
-    <label><input type="checkbox" id="rules" /> Я прочитал и принимаю правила</label>
-    <button class="btn" onclick="submitRegistration()">Далее</button>
-  </div>
-
-  <div id="teamForm" class="card hidden">
-    <h3>Состав команды</h3>
-    <input type="text" placeholder="Название команды" id="teamName" />
-    <div id="playersInputs"></div>
-    <button class="btn" onclick="submitTeam()">Зарегистрировать команду</button>
-  </div>
-
-  <div class="card">
-    <h3>Зарегистрированные команды:</h3>
-    <ul id="teams"></ul>
-  </div>
-
-  <div class="card">
-    <h3>Турнирная таблица матчей</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Команда 1</th>
-          <th>Счет</th>
-          <th>Команда 2</th>
-          <th>Счет</th>
-          <th>Отметить победителя</th>
-        </tr>
-      </thead>
-      <tbody id="matchesBody">
-        <tr><td colspan="5" style="padding: 10px;">Матчи не добавлены</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<script>
-  const teamSize = 5;
-
-  function showRegistration() {
-    document.getElementById("registration").classList.remove("hidden");
-    document.getElementById("teamForm").classList.add("hidden");
-  }
-
-  function submitRegistration() {
-    const phone = document.getElementById("phone").value.trim();
-    const captainId = document.getElementById("captainId").value.trim();
-    const rules = document.getElementById("rules").checked;
-    if (!phone || !captainId || !rules) {
-      alert("Пожалуйста, заполните все поля и примите правила.");
-      return;
-    }
-    document.getElementById("registration").classList.add("hidden");
-    document.getElementById("teamForm").classList.remove("hidden");
-
-    const playersContainer = document.getElementById("playersInputs");
-    playersContainer.innerHTML = "";
-    for (let i = 1; i <= teamSize; i++) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.placeholder = `ID игрока ${i}`;
-      input.className = "player";
-      playersContainer.appendChild(input);
-    }
-    window.tempCaptainId = captainId;
-  }
-
-  function submitTeam() {
-    const name = document.getElementById("teamName").value.trim();
-    const playersInputs = document.querySelectorAll(".player");
-    const players = [...playersInputs].map(input => input.value.trim());
-    if (!name || players.some(p => !p)) {
-      alert("Заполните название команды и всех игроков.");
-      return;
-    }
-    const team = {
-      id: Date.now(), // уникальный id команды
-      name,
-      captainId: window.tempCaptainId || "",
-      players,
-      eliminated: false // пометка вылета
-    };
-
-    const teams = JSON.parse(localStorage.getItem("teamsData") || "[]");
-    teams.push(team);
-    localStorage.setItem("teamsData", JSON.stringify(teams));
-
-    alert("Команда успешно зарегистрирована!");
-    document.getElementById("teamName").value = "";
-    playersInputs.forEach(input => input.value = "");
-    document.getElementById("teamForm").classList.add("hidden");
-
-    renderTeams();
-    buildMatchesIfNeeded();
-    renderMatches();
-  }
-
-  function renderTeams() {
-    const teams = JSON.parse(localStorage.getItem("teamsData") || "[]");
-    const ul = document.getElementById("teams");
-    ul.innerHTML = "";
-    if (teams.length === 0) {
-      ul.innerHTML = "<li>Пока нет зарегистрированных команд</li>";
-      return;
-    }
-    teams.forEach(team => {
-      const li = document.createElement("li");
-      li.textContent = `${team.name} (Капитан: ${team.captainId}; Игроки: ${team.players.join(", ")})`;
-      if (team.eliminated) li.classList.add("eliminated");
-      ul.appendChild(li);
-    });
-  }
-
-  function buildMatchesIfNeeded() {
-    let matches = JSON.parse(localStorage.getItem("matchesData") || "[]");
-    const teams = JSON.parse(localStorage.getItem("teamsData") || "[]");
-
-    // если матчей нет, создаём пары автоматически из команд, которые не вылетели
-    if (matches.length === 0 && teams.length >= 2) {
-      matches = [];
-      const aliveTeams = teams.filter(t => !t.eliminated);
-      for (let i = 0; i < aliveTeams.length; i += 2) {
-        if (aliveTeams[i + 1]) {
-          matches.push({
-            id: Date.now() + i,
-            team1: aliveTeams[i].name,
-            team1Id: aliveTeams[i].id,
-            score1: 0,
-            team2: aliveTeams[i + 1].name,
-            team2Id: aliveTeams[i + 1].id,
-            score2: 0,
-            winnerId: null // id команды-победителя
-          });
-        }
-      }
-      localStorage.setItem("matchesData", JSON.stringify(matches));
-    }
-  }
-
-  function renderMatches() {
-    const matches = JSON.parse(localStorage.getItem("matchesData") || "[]");
-    const teams = JSON.parse(localStorage.getItem("teamsData") || "[]");
-    const tbody = document.getElementById("matchesBody");
-    tbody.innerHTML = "";
-
-    if (!matches.length) {
-      tbody.innerHTML = `<tr><td colspan="5" style="padding: 10px;">Матчи не добавлены</td></tr>`;
-      return;
-    }
-
-    matches.forEach(match => {
-      const team1 = teams.find(t => t.id === match.team1Id);
-      const team2 = teams.find(t => t.id === match.team2Id);
-      if (!team1 || !team2) return;
-
-      const tr = document.createElement("tr");
-
-      // Клетки с именами команд, зачёркнуты, если вылетели
-      const team1Class = team1.eliminated ? "eliminated" : "";
-      const team2Class = team2.eliminated ? "eliminated" : "";
-
-      // Кнопки для выбора победителя
-      let winnerButtons = "";
-      if (!match.winnerId) {
-        winnerButtons = `
-          <button class="winner-btn" onclick="setWinner(${match.id}, ${team1.id})">Победитель: ${team1.name}</button>
-          <button class="winner-btn" onclick="setWinner(${match.id}, ${team2.id})">Победитель: ${team2.name}</button>
-        `;
-      } else {
-        const winnerName = teams.find(t => t.id === match.winnerId)?.name || "—";
-        winnerButtons = `<b style="color:#facc15">Победитель: ${winnerName}</b>`;
+  <script>
+    async function register() {
+      const phone = document.getElementById("phone").value.trim();
+      if (!phone) {
+        document.getElementById("status").innerText = "Введите номер.";
+        return;
       }
 
-      tr.innerHTML = `
-        <td class="${team1Class}" style="text-align:left;">${team1.name}</td>
-        <td>${match.score1}</td>
-        <td class="${team2Class}" style="text-align:left;">${team2.name}</td>
-        <td>${match.score2}</td>
-        <td>${winnerButtons}</td>
-      `;
+      const res = await fetch('https://ТВОЙ_СЕРВЕР/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone })
+      });
 
-      tbody.appendChild(tr);
-    });
-  }
-
-  function setWinner(matchId, winnerTeamId) {
-    const matches = JSON.parse(localStorage.getItem("matchesData") || "[]");
-    const teams = JSON.parse(localStorage.getItem("teamsData") || "[]");
-
-    const match = matches.find(m => m.id === matchId);
-    if (!match) return;
-
-    match.winnerId = winnerTeamId;
-
-    // Установим очки (просто пример, можно заменить на реальную логику подсчёта)
-    if (winnerTeamId === match.team1Id) {
-      match.score1 = 10;
-      match.score2 = 4;
-    } else {
-      match.score1 = 4;
-      match.score2 = 10;
+      const data = await res.text();
+      document.getElementById("status").innerText = data;
     }
-
-    // Обновляем состояние команд — проигравшая команда вылетает
-    const loserId = (winnerTeamId === match.team1Id) ? match.team2Id : match.team1Id;
-    const loserTeam = teams.find(t => t.id === loserId);
-    if (loserTeam) {
-      loserTeam.eliminated = true;
-    }
-
-    // Сохраняем изменения
-    localStorage.setItem("matchesData", JSON.stringify(matches));
-    localStorage.setItem("teamsData", JSON.stringify(teams));
-
-    renderTeams();
-    renderMatches();
-  }
-
-  window.onload = () => {
-    renderTeams();
-    buildMatchesIfNeeded();
-    renderMatches();
-  };
-</script>
+  </script>
 </body>
 </html>
