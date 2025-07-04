@@ -5,19 +5,21 @@
   <title>Турниры Standoff 2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to bottom, #111, #000);
       color: white;
     }
     header {
       text-align: center;
-      padding: 50px 20px;
+      padding: 40px 20px;
     }
     h1 {
       color: #facc15;
-      font-size: 48px;
+      font-size: 40px;
+      margin-bottom: 10px;
     }
     .container {
       max-width: 800px;
@@ -30,15 +32,17 @@
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 30px;
+      overflow: hidden;
     }
     .btn {
       background: #facc15;
       color: black;
-      padding: 10px 20px;
+      padding: 10px 16px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      width: 100%;
     }
     .btn:hover {
       background: #eab308;
@@ -49,20 +53,34 @@
     input[type="text"], input[type="tel"] {
       width: 100%;
       padding: 10px;
-      margin: 8px 0;
+      margin: 8px 0 16px;
       border-radius: 8px;
       border: none;
+      font-size: 16px;
+    }
+    label {
+      font-size: 14px;
     }
     video {
       width: 100%;
       border-radius: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 6px;
+      color: #facc15;
     }
     footer {
       text-align: center;
       padding: 30px;
       font-size: 14px;
       color: #aaa;
+    }
+    @media (max-width: 500px) {
+      h1 { font-size: 28px; }
     }
   </style>
 </head>
@@ -76,7 +94,7 @@
 
     <div class="card">
       <h2>Турнир #3</h2>
-      <p>Описание турнира: Турнир 5x5, приз — 5000₽, взнос: 100₽ с игрока</p>
+      <p>Описание: Турнир 5x5, приз — 5000₽, взнос — 100₽/игрок</p>
       <p>Дата: 10 июля 2025, 18:00</p>
       <button class="btn" onclick="showRegistration()">Участвовать</button>
     </div>
@@ -85,9 +103,7 @@
       <h3>Регистрация</h3>
       <input type="tel" placeholder="Номер телефона" id="phone" />
       <input type="text" placeholder="ID в Standoff 2" id="standoffId" />
-      <label>
-        <input type="checkbox" id="rules" /> Я прочитал(а) и принимаю правила
-      </label>
+      <label><input type="checkbox" id="rules" /> Я прочитал и принимаю правила</label>
       <button class="btn" onclick="submitRegistration()">Далее</button>
     </div>
 
@@ -136,8 +152,8 @@
     }
 
     function submitRegistration() {
-      const phone = document.getElementById("phone").value;
-      const id = document.getElementById("standoffId").value;
+      const phone = document.getElementById("phone").value.trim();
+      const id = document.getElementById("standoffId").value.trim();
       const rules = document.getElementById("rules").checked;
       if (!phone || !id || !rules) {
         alert("Пожалуйста, заполните все поля и примите правила.");
@@ -150,17 +166,17 @@
       for (let i = 1; i <= teamSize; i++) {
         const input = document.createElement("input");
         input.type = "text";
-        input.placeholder = `Игрок ${i} ID`;
+        input.placeholder = `ID игрока ${i}`;
         input.className = "player";
         playersContainer.appendChild(input);
       }
     }
 
     function submitTeam() {
-      const name = document.getElementById("teamName").value;
+      const name = document.getElementById("teamName").value.trim();
       const players = document.querySelectorAll(".player");
-      if (!name || [...players].some(input => !input.value)) {
-        alert("Заполните название команды и всех игроков");
+      if (!name || [...players].some(input => !input.value.trim())) {
+        alert("Заполните название команды и всех игроков.");
         return;
       }
       document.getElementById("teamForm").classList.add("hidden");
@@ -168,19 +184,33 @@
     }
 
     function confirmPayment() {
-      const code = document.getElementById("payCode").value;
+      const code = document.getElementById("payCode").value.trim();
       if (!code) {
-        alert("Введите код оплаты");
+        alert("Введите код оплаты.");
         return;
       }
-      const name = document.getElementById("teamName").value;
-      const list = document.getElementById("teams");
-      const li = document.createElement("li");
-      li.textContent = name;
-      list.appendChild(li);
+      const name = document.getElementById("teamName").value.trim();
+      const teams = JSON.parse(localStorage.getItem("teams") || "[]");
+      teams.push(name);
+      localStorage.setItem("teams", JSON.stringify(teams));
+      addTeamToUI(name);
       document.getElementById("paymentForm").classList.add("hidden");
       alert("Команда успешно зарегистрирована!");
     }
+
+    function addTeamToUI(name) {
+      const li = document.createElement("li");
+      li.textContent = name;
+      document.getElementById("teams").appendChild(li);
+    }
+
+    function loadTeams() {
+      const saved = JSON.parse(localStorage.getItem("teams") || "[]");
+      saved.forEach(addTeamToUI);
+    }
+
+    window.onload = loadTeams;
   </script>
+
 </body>
 </html>
