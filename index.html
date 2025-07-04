@@ -222,7 +222,45 @@
       const saved = JSON.parse(localStorage.getItem("teams") || "[]");
       saved.forEach(addTeamToUI);
     }
+    function addTeamToUI(team) {
+  // team = { name: string, players: [string], captainId: string }
+  const li = document.createElement("li");
+  li.textContent = `${team.name} (Капитан: ${team.captainId}; Игроки: ${team.players.join(", ")})`;
+  document.getElementById("teams").appendChild(li);
+}
 
+function loadTeams() {
+  const savedTeams = JSON.parse(localStorage.getItem("teamsData") || "[]");
+  savedTeams.forEach(addTeamToUI);
+}
+
+function renderMatches() {
+  const matches = JSON.parse(localStorage.getItem("matchesData") || "[]");
+  const tbody = document.getElementById("matchesBody");
+  tbody.innerHTML = "";
+  if (matches.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="padding: 10px; text-align: center;">Матчи не добавлены</td></tr>`;
+    return;
+  }
+  matches.forEach(m => {
+    const winner = (m.score1 > m.score2) ? m.team1 : (m.score2 > m.score1) ? m.team2 : "Ничья";
+    const tr = document.createElement("tr");
+    tr.style.borderBottom = "1px solid #facc15";
+    tr.innerHTML = `
+      <td style="padding: 8px;">${m.team1}</td>
+      <td style="padding: 8px; text-align: center;">${m.score1 !== null ? m.score1 : "-"}</td>
+      <td style="padding: 8px;">${m.team2}</td>
+      <td style="padding: 8px; text-align: center;">${m.score2 !== null ? m.score2 : "-"}</td>
+      <td style="padding: 8px; text-align: center; font-weight: bold; color: #facc15;">${winner}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+window.onload = () => {
+  loadTeams();
+  renderMatches();
+};
     window.onload = loadTeams;
   </script>
 
