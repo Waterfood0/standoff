@@ -16,6 +16,7 @@
     label {
       display: block;
       margin-top: 15px;
+      font-weight: bold;
     }
     textarea, input[type="text"], input[type="number"] {
       width: 100%;
@@ -27,6 +28,7 @@
       color: white;
       font-size: 16px;
       box-sizing: border-box;
+      resize: vertical;
     }
     button {
       margin-top: 20px;
@@ -38,6 +40,7 @@
       font-weight: bold;
       cursor: pointer;
       width: 100%;
+      font-size: 18px;
     }
     button:hover {
       background: #eab308;
@@ -47,40 +50,66 @@
       margin-bottom: 30px;
       color: #facc15;
     }
+    .match {
+      border: 1px solid #facc15;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      background: #222;
+    }
+    .match label {
+      display: inline-block;
+      margin-right: 20px;
+      cursor: pointer;
+    }
+    .score-input {
+      width: 60px;
+      padding: 5px;
+      margin-left: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #333;
+      color: white;
+      font-size: 16px;
+      text-align: center;
+    }
+    .info {
+      font-size: 14px;
+      color: #bbb;
+      margin-top: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
   <h1>Админка турнира Standoff 2</h1>
 
-  <label>Список команд (каждая команда с новой строки в формате: Название команды,Капитан ID,Игрок1 ID,Игрок2 ID,...)</label>
+  <label for="teamsInput">Список команд (каждая команда с новой строки в формате:<br>Название команды,Капитан ID,Игрок1 ID,Игрок2 ID,...)</label>
   <textarea id="teamsInput" rows="8" placeholder="Пример: TeamA,12345,111,222,333,444"></textarea>
 
-  <label>Список матчей (каждый матч с новой строки, формат: Команда1,Счет1,Команда2,Счет2)</label>
-  <textarea id="matchesInput" rows="8" placeholder="Пример: TeamA,2,TeamB,1"></textarea>
+  <button onclick="saveTeams()">Сохранить команды</button>
 
-  <button onclick="saveData()">Сохранить данные</button>
+  <hr style="margin: 30px 0; border-color: #333;" />
+
+  <h2>Пары текущего раунда</h2>
+  <div id="matchesContainer">
+    <p class="info">Пары ещё не сформированы. Сформируйте новый раунд.</p>
+  </div>
+
+  <button onclick="startNewRound()">Сформировать новый раунд (рандом)</button>
+  <button onclick="saveMatchResults()">Сохранить результаты матчей</button>
 
   <script>
-    // Загружаем данные при открытии
-    window.onload = function() {
-      const teamsData = JSON.parse(localStorage.getItem("teamsData") || "[]");
-      const matchesData = JSON.parse(localStorage.getItem("matchesData") || "[]");
-
-      // Формируем текст для команд
-      const teamsText = teamsData.map(t => [t.name, t.captainId, ...t.players].join(",")).join("\n");
-      document.getElementById("teamsInput").value = teamsText;
-
-      // Формируем текст для матчей
-      const matchesText = matchesData.map(m => [m.team1, m.score1, m.team2, m.score2].join(",")).join("\n");
-      document.getElementById("matchesInput").value = matchesText;
+    // Загрузка и сохранение команд
+    function loadTeams() {
+      return JSON.parse(localStorage.getItem("teamsData") || "[]");
     }
 
-    function saveData() {
-      // Читаем команды из textarea
+    function saveTeams() {
       const teamsRaw = document.getElementById("teamsInput").value.trim();
-      const teamsLines = teamsRaw.split("\n").filter(l => l.trim() !== "");
-      const teamsData = teamsLines.map(line => {
+      const lines = teamsRaw.split("\n").filter(line => line.trim() !== "");
+      const teams = lines.map(line => {
         const parts = line.split(",").map(s => s.trim());
         return {
           name: parts[0] || "Без имени",
@@ -88,26 +117,166 @@
           players: parts.slice(2)
         };
       });
-
-      // Читаем матчи
-      const matchesRaw = document.getElementById("matchesInput").value.trim();
-      const matchesLines = matchesRaw.split("\n").filter(l => l.trim() !== "");
-      const matchesData = matchesLines.map(line => {
-        const parts = line.split(",").map(s => s.trim());
-        return {
-          team1: parts[0] || "",
-          score1: parts[1] !== undefined ? parseInt(parts[1]) : null,
-          team2: parts[2] || "",
-          score2: parts[3] !== undefined ? parseInt(parts[3]) : null,
-        };
-      });
-
-      // Сохраняем в localStorage
-      localStorage.setItem("teamsData", JSON.stringify(teamsData));
-      localStorage.setItem("matchesData", JSON.stringify(matchesData));
-
-      alert("Данные сохранены!");
+      localStorage.setItem("teamsData", JSON.stringify(teams));
+      alert("Команды сохранены!");
+      renderMatches(); // Обновим пары на случай, если команды поменялись
     }
+
+    // Загрузка и сохранение пар для текущего раунда
+    function loadRoundPairs() {
+      return JSON.parse(localStorage.getItem("roundPairs") || "[]");
+    }
+
+    function saveRoundPairs(pairs) {
+      localStorage.setItem("roundPairs", JSON.stringify(pairs));
+    }
+
+    // Загрузка и сохранение результатов матчей
+    function loadMatchResults() {
+      return JSON.parse(localStorage.getItem("matchesData") || "[]");
+    }
+
+    function saveMatchResultsToStorage(results) {
+      localStorage.setItem("matchesData", JSON.stringify(results));
+    }
+
+    // Рендеринг формы для ввода результатов матчей
+    function renderMatches() {
+      const container = document.getElementById("matchesContainer");
+      const pairs = loadRoundPairs();
+
+      if (pairs.length === 0) {
+        container.innerHTML = '<p class="info">Пары ещё не сформированы. Сформируйте новый раунд.</p>';
+        return;
+      }
+
+      const results = loadMatchResults();
+
+      container.innerHTML = "";
+      pairs.forEach((pair, idx) => {
+        // Находим уже сохранённый результат, если есть
+        const savedResult = results.find(r =>
+          (r.team1 === pair.team1 && r.team2 === pair.team2) ||
+          (r.team1 === pair.team2 && r.team2 === pair.team1)
+        );
+
+        container.insertAdjacentHTML("beforeend", `
+          <div class="match">
+            <div>
+              <label>
+                <input type="radio" name="winner${idx}" value="team1" ${savedResult && savedResult.winner === pair.team1 ? "checked" : ""} />
+                <strong>${pair.team1}</strong>
+              </label>
+              <input type="number" min="0" id="score1_${idx}" class="score-input" placeholder="Счет" value="${savedResult && savedResult.team1 === pair.team1 ? savedResult.score1 : ""}" />
+            </div>
+            <div style="margin-top: 10px;">
+              <label>
+                <input type="radio" name="winner${idx}" value="team2" ${savedResult && savedResult.winner === pair.team2 ? "checked" : ""} />
+                <strong>${pair.team2}</strong>
+              </label>
+              <input type="number" min="0" id="score2_${idx}" class="score-input" placeholder="Счет" value="${savedResult && savedResult.team2 === pair.team2 ? savedResult.score2 : ""}" />
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    // Сохраняем результаты и обновляем команды (удаляем проигравших)
+    function saveMatchResults() {
+      const pairs = loadRoundPairs();
+      const results = [];
+
+      for (let i = 0; i < pairs.length; i++) {
+        const score1Input = document.getElementById(`score1_${i}`);
+        const score2Input = document.getElementById(`score2_${i}`);
+        const winnerRadio = document.querySelector(`input[name="winner${i}"]:checked`);
+
+        if (!score1Input.value || !score2Input.value || !winnerRadio) {
+          alert(`Пожалуйста, заполните все поля для матча №${i + 1}`);
+          return;
+        }
+
+        const score1 = parseInt(score1Input.value);
+        const score2 = parseInt(score2Input.value);
+        if (isNaN(score1) || isNaN(score2)) {
+          alert(`Введите корректные числа в счетах для матча №${i + 1}`);
+          return;
+        }
+
+        const winner = winnerRadio.value === "team1" ? pairs[i].team1 : pairs[i].team2;
+        const loser = winnerRadio.value === "team1" ? pairs[i].team2 : pairs[i].team1;
+
+        results.push({
+          team1: pairs[i].team1,
+          score1,
+          team2: pairs[i].team2,
+          score2,
+          winner,
+          loser,
+        });
+      }
+
+      // Сохраняем результаты
+      saveMatchResultsToStorage(results);
+
+      // Обновляем список команд: удаляем проигравших
+      let teams = loadTeams();
+      results.forEach(match => {
+        teams = teams.filter(t => t.name !== match.loser);
+      });
+      localStorage.setItem("teamsData", JSON.stringify(teams));
+
+      // Очищаем пары и результаты — следующий раунд будет свежим
+      localStorage.removeItem("roundPairs");
+      localStorage.removeItem("matchesData");
+
+      alert("Результаты сохранены! Проигравшие удалены из списка команд.");
+      renderTeamsInput();
+      renderMatches();
+    }
+
+    // Формируем пары на новый раунд рандомно
+    function startNewRound() {
+      let teams = loadTeams();
+
+      if (teams.length < 2) {
+        alert("Недостаточно команд для нового раунда.");
+        return;
+      }
+
+      // Перемешиваем
+      teams = teams.sort(() => Math.random() - 0.5);
+
+      const pairs = [];
+      while (teams.length > 1) {
+        const team1 = teams.shift().name;
+        const team2 = teams.shift().name;
+        pairs.push({ team1, team2 });
+      }
+
+      // Если нечетное число — последняя команда получает "бай"
+      if (teams.length === 1) {
+        pairs.push({ team1: teams[0].name, team2: "бай" });
+        teams.shift();
+      }
+
+      saveRoundPairs(pairs);
+      renderMatches();
+      alert("Новый раунд сформирован!");
+    }
+
+    // Обновляем textarea с командами при изменениях
+    function renderTeamsInput() {
+      const teams = loadTeams();
+      const teamsText = teams.map(t => [t.name, t.captainId, ...t.players].join(",")).join("\n");
+      document.getElementById("teamsInput").value = teamsText;
+    }
+
+    // При загрузке страницы
+    window.onload = function() {
+      renderTeamsInput();
+      renderMatches();
+    };
   </script>
 
 </body>
