@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Турниры Standoff 2</title>
+  <title>Турниры Standoff 2 — Регистрация</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * { box-sizing: border-box; }
@@ -61,11 +61,6 @@
     label {
       font-size: 14px;
     }
-    video {
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
     ul {
       padding-left: 20px;
     }
@@ -73,11 +68,18 @@
       margin-bottom: 6px;
       color: #facc15;
     }
-    footer {
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      padding: 8px;
+      border-bottom: 1px solid #facc15;
       text-align: center;
-      padding: 30px;
-      font-size: 14px;
-      color: #aaa;
+    }
+    th {
+      text-align: left;
     }
     @media (max-width: 500px) {
       h1 { font-size: 28px; }
@@ -85,13 +87,10 @@
   </style>
 </head>
 <body>
-
   <header>
     <h1>🔥 Турниры Standoff 2</h1>
   </header>
-
   <div class="container">
-
     <div class="card">
       <h2>Турнир #3</h2>
       <p>Описание: Турнир 5x5, приз — 5000₽, взнос — 100₽/игрок</p>
@@ -101,8 +100,8 @@
 
     <div id="registration" class="card hidden">
       <h3>Регистрация</h3>
-      <input type="tel" placeholder="Номер телефона" id="phone" />
-      <input type="text" placeholder="ID в Standoff 2" id="standoffId" />
+      <input type="tel" placeholder="Номер телефона (капитана)" id="phone" />
+      <input type="text" placeholder="ID капитана в Standoff 2" id="captainId" />
       <label><input type="checkbox" id="rules" /> Я прочитал и принимаю правила</label>
       <button class="btn" onclick="submitRegistration()">Далее</button>
     </div>
@@ -111,70 +110,52 @@
       <h3>Состав команды</h3>
       <input type="text" placeholder="Название команды" id="teamName" />
       <div id="playersInputs"></div>
-      <button class="btn" onclick="submitTeam()">Далее к оплате</button>
-    </div>
-
-    <div id="paymentForm" class="card hidden">
-      <h3>Оплата</h3>
-      <p>Введите код, полученный после оплаты:</p>
-      <input type="text" placeholder="Код оплаты" id="payCode" />
-      <button class="btn" onclick="confirmPayment()">Подтвердить</button>
-    </div>
-
-    <div class="card" id="teamsList">
-      <h3>Команды:</h3>
-<ul id="teams"></ul>
-
-<h3>Турнирная таблица матчей</h3>
-<table id="matchesTable" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-  <thead>
-    <tr style="border-bottom: 2px solid #facc15;">
-      <th style="padding: 8px; text-align: left;">Команда 1</th>
-      <th style="padding: 8px;">Счет</th>
-      <th style="padding: 8px; text-align: left;">Команда 2</th>
-      <th style="padding: 8px;">Счет</th>
-      <th style="padding: 8px;">Победитель</th>
-    </tr>
-  </thead>
-  <tbody id="matchesBody"></tbody>
-</table>
+      <button class="btn" onclick="submitTeam()">Зарегистрировать команду</button>
     </div>
 
     <div class="card">
-      <h3>Яркие моменты</h3>
-      <video controls src="videos/highlight1.mp4"></video>
-      <video controls src="videos/highlight2.mp4"></video>
+      <h3>Зарегистрированные команды:</h3>
+      <ul id="teams"></ul>
     </div>
 
     <div class="card">
-      <h3>Полные матчи</h3>
-      <video controls src="videos/match1.mp4"></video>
-      <video controls src="videos/match2.mp4"></video>
+      <h3>Турнирная таблица матчей</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Команда 1</th>
+            <th>Счет</th>
+            <th>Команда 2</th>
+            <th>Счет</th>
+            <th>Победитель</th>
+          </tr>
+        </thead>
+        <tbody id="matchesBody">
+          <tr><td colspan="5" style="padding: 10px;">Матчи не добавлены</td></tr>
+        </tbody>
+      </table>
     </div>
-
   </div>
 
-  <footer>
-    Все видео — в <a href="https://t.me/yourchannel" target="_blank" style="color: #facc15;">нашем Telegram-канале</a>
-  </footer>
-
   <script>
-    let teamSize = 5;
+    const teamSize = 5;
 
     function showRegistration() {
       document.getElementById("registration").classList.remove("hidden");
+      document.getElementById("teamForm").classList.add("hidden");
     }
 
     function submitRegistration() {
       const phone = document.getElementById("phone").value.trim();
-      const id = document.getElementById("standoffId").value.trim();
+      const captainId = document.getElementById("captainId").value.trim();
       const rules = document.getElementById("rules").checked;
-      if (!phone || !id || !rules) {
+      if (!phone || !captainId || !rules) {
         alert("Пожалуйста, заполните все поля и примите правила.");
         return;
       }
       document.getElementById("registration").classList.add("hidden");
       document.getElementById("teamForm").classList.remove("hidden");
+
       const playersContainer = document.getElementById("playersInputs");
       playersContainer.innerHTML = "";
       for (let i = 1; i <= teamSize; i++) {
@@ -184,85 +165,81 @@
         input.className = "player";
         playersContainer.appendChild(input);
       }
+      // Сохраним временно данные капитана
+      window.tempCaptainId = captainId;
     }
 
     function submitTeam() {
       const name = document.getElementById("teamName").value.trim();
-      const players = document.querySelectorAll(".player");
-      if (!name || [...players].some(input => !input.value.trim())) {
+      const playersInputs = document.querySelectorAll(".player");
+      const players = [...playersInputs].map(input => input.value.trim());
+      if (!name || players.some(p => !p)) {
         alert("Заполните название команды и всех игроков.");
         return;
       }
-      document.getElementById("teamForm").classList.add("hidden");
-      document.getElementById("paymentForm").classList.remove("hidden");
-    }
+      // Сформируем объект команды в том же формате, что и админка
+      const team = {
+        name,
+        captainId: window.tempCaptainId || "",
+        players
+      };
 
-    function confirmPayment() {
-      const code = document.getElementById("payCode").value.trim();
-      if (!code) {
-        alert("Введите код оплаты.");
-        return;
-      }
-      const name = document.getElementById("teamName").value.trim();
-      const teams = JSON.parse(localStorage.getItem("teams") || "[]");
-      teams.push(name);
-      localStorage.setItem("teams", JSON.stringify(teams));
-      addTeamToUI(name);
-      document.getElementById("paymentForm").classList.add("hidden");
+      // Загрузим текущие команды из localStorage (формат админки)
+      const teams = JSON.parse(localStorage.getItem("teamsData") || "[]");
+      teams.push(team);
+      localStorage.setItem("teamsData", JSON.stringify(teams));
+
       alert("Команда успешно зарегистрирована!");
+      document.getElementById("teamName").value = "";
+      playersInputs.forEach(input => input.value = "");
+      document.getElementById("teamForm").classList.add("hidden");
+
+      renderTeams();
     }
 
-    function addTeamToUI(name) {
+    function addTeamToUI(team) {
       const li = document.createElement("li");
-      li.textContent = name;
+      li.textContent = `${team.name} (Капитан: ${team.captainId}; Игроки: ${team.players.join(", ")})`;
       document.getElementById("teams").appendChild(li);
     }
 
-    function loadTeams() {
-      const saved = JSON.parse(localStorage.getItem("teams") || "[]");
-      saved.forEach(addTeamToUI);
+    function renderTeams() {
+      const teams = JSON.parse(localStorage.getItem("teamsData") || "[]");
+      const ul = document.getElementById("teams");
+      ul.innerHTML = "";
+      if (teams.length === 0) {
+        ul.innerHTML = "<li>Пока нет зарегистрированных команд</li>";
+        return;
+      }
+      teams.forEach(addTeamToUI);
     }
-    function addTeamToUI(team) {
-  // team = { name: string, players: [string], captainId: string }
-  const li = document.createElement("li");
-  li.textContent = `${team.name} (Капитан: ${team.captainId}; Игроки: ${team.players.join(", ")})`;
-  document.getElementById("teams").appendChild(li);
-}
 
-function loadTeams() {
-  const savedTeams = JSON.parse(localStorage.getItem("teamsData") || "[]");
-  savedTeams.forEach(addTeamToUI);
-}
+    function renderMatches() {
+      const matches = JSON.parse(localStorage.getItem("matchesData") || "[]");
+      const tbody = document.getElementById("matchesBody");
+      tbody.innerHTML = "";
+      if (!matches.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding: 10px;">Матчи не добавлены</td></tr>`;
+        return;
+      }
+      matches.forEach(m => {
+        const winner = (m.score1 > m.score2) ? m.team1 : (m.score2 > m.score1) ? m.team2 : "Ничья";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="text-align: left;">${m.team1}</td>
+          <td>${m.score1 !== null ? m.score1 : "-"}</td>
+          <td style="text-align: left;">${m.team2}</td>
+          <td>${m.score2 !== null ? m.score2 : "-"}</td>
+          <td style="font-weight: bold; color: #facc15;">${winner}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-function renderMatches() {
-  const matches = JSON.parse(localStorage.getItem("matchesData") || "[]");
-  const tbody = document.getElementById("matchesBody");
-  tbody.innerHTML = "";
-  if (matches.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="padding: 10px; text-align: center;">Матчи не добавлены</td></tr>`;
-    return;
-  }
-  matches.forEach(m => {
-    const winner = (m.score1 > m.score2) ? m.team1 : (m.score2 > m.score1) ? m.team2 : "Ничья";
-    const tr = document.createElement("tr");
-    tr.style.borderBottom = "1px solid #facc15";
-    tr.innerHTML = `
-      <td style="padding: 8px;">${m.team1}</td>
-      <td style="padding: 8px; text-align: center;">${m.score1 !== null ? m.score1 : "-"}</td>
-      <td style="padding: 8px;">${m.team2}</td>
-      <td style="padding: 8px; text-align: center;">${m.score2 !== null ? m.score2 : "-"}</td>
-      <td style="padding: 8px; text-align: center; font-weight: bold; color: #facc15;">${winner}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-window.onload = () => {
-  loadTeams();
-  renderMatches();
-};
-    window.onload = loadTeams;
+    window.onload = () => {
+      renderTeams();
+      renderMatches();
+    };
   </script>
-
 </body>
 </html>
