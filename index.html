@@ -1,126 +1,73 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Турнирная регистрация</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="index, follow">
+  <meta name="description" content="Standoff 2 турниры — участвуй и побеждай!">
+  <title>Standoff Турниры</title>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 30px;
+      font-family: 'Russo One', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
     }
     h1 {
-      text-align: center;
-      color: #222;
+      font-size: 3rem;
+      margin-bottom: 1rem;
     }
-    .container {
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
       max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
     }
-    input, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      background: #4CAF50;
+    .btn {
+      background: #ff416c;
+      background: linear-gradient(to right, #ff4b2b, #ff416c);
       color: white;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
       border: none;
+      border-radius: 10px;
       cursor: pointer;
-      margin-top: 15px;
+      text-decoration: none;
+      transition: transform 0.2s ease;
     }
-    button:hover {
-      background: #45a049;
+    .btn:hover {
+      transform: scale(1.05);
     }
-    .info {
-      background: #e9f5e9;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
+    footer {
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Регистрация на турнир</h1>
-    <div class="info">
-      Участие команды (5 человек) стоит 250 руб. По 50 руб. за каждого.  
-      Оплатите, затем введите код и заполните данные.
-    </div>
 
-    <button onclick="showForm()">Участвовать в турнире</button>
+  <h1>Добро пожаловать на Standoff Турниры!</h1>
+  <p>Участвуй в турнирах по Standoff 2, выигрывай призы и докажи, что ты лучший!</p>
 
-    <div id="formSection" style="display:none;">
-      <input type="text" id="teamName" placeholder="Название команды" required>
-      <input type="text" id="captain" placeholder="Капитан команды" required>
-      <input type="text" id="player1" placeholder="Игрок 1" required>
-      <input type="text" id="player2" placeholder="Игрок 2" required>
-      <input type="text" id="player3" placeholder="Игрок 3" required>
-      <input type="text" id="player4" placeholder="Игрок 4" required>
-      <input type="text" id="paymentCode" placeholder="Код оплаты" required>
-      
-      <textarea id="rules" readonly rows="4">
-        Обязательное условие: соблюдать правила турнира, быть вовремя и уважать других участников.
-      </textarea>
+  <a class="btn" href="https://your-tournament-url.loca.lt" target="_blank">
+    Перейти к турнирам
+  </a>
 
-      <label>
-        <input type="checkbox" id="agreeRules"> Я прочитал правила
-      </label>
+  <footer>
+    &copy; 2025 Все права защищены
+  </footer>
 
-      <button onclick="submitForm()">Подать заявку</button>
-    </div>
-  </div>
-
-  <script>
-    function showForm() {
-      document.getElementById('formSection').style.display = 'block';
-    }
-
-    function submitForm() {
-      const teamName = document.getElementById("teamName").value;
-      const captain = document.getElementById("captain").value;
-      const players = [
-        captain,
-        document.getElementById("player1").value,
-        document.getElementById("player2").value,
-        document.getElementById("player3").value,
-        document.getElementById("player4").value,
-      ];
-      const paymentCode = document.getElementById("paymentCode").value;
-      const agree = document.getElementById("agreeRules").checked;
-
-      if (!agree) {
-        alert("Вы должны прочитать и согласиться с правилами.");
-        return;
-      }
-
-      const payload = {
-        team_name: teamName,
-        captain: captain,
-        players: players,
-        payment_code: paymentCode
-      };
-
-      fetch('http://localhost:5000/register', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(data => {
-        alert(data.message);
-      })
-      .catch(err => {
-        alert("Ошибка отправки данных");
-      });
-    }
-  </script>
 </body>
 </html>
