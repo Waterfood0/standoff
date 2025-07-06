@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://waterfood0.github.io/standoff/sitemap.xml
